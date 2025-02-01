@@ -1,0 +1,54 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/Users/mhadley/Dev/CAP1188/src",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/variants/standard",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Users/mhadley/Dev/CAP1188/src",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/Users/mhadley/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60116",
+                "ARDUINO_AVR_UNO",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "/Users/mhadley/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,19 @@
+{
+  "name": "CAP1188",
+  "version": "0.0.1",
+  "description": "A library for the CAP1188 capacitive touch sensor on ESP32",
+  "keywords": ["touch", "sensor", "led", "driver", "capacitive"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MattressPadley/CAP1188.git"
+  },
+  "authors": [
+    {
+      "name": "Matt Hadley",
+      "email": "hello@matthadley.com",
+      "url": "https://github.com/MattressPadley"
+    }
+  ],
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32"]
+}
