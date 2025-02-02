@@ -2,6 +2,8 @@
 
 This library provides an interface for the CAP1188 capacitive touch sensor over I2C. The CAP1188 features 8 capacitive touch inputs and corresponding LED outputs with various animation capabilities.
 
+I couldn't get the Adafruit library to work on my ESP32, so I wrote my own. (with an AI)
+
 ## Installation
 
 Include this library in your project and make sure you have the Wire (I2C) library available.
