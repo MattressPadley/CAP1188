@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/MattressPadley/CAP1188.git"
   },
+  "export": {
+    "exclude": ["info", "examples"]
+  },
   "authors": [
     {
       "name": "Matt Hadley",
