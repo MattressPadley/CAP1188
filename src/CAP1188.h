@@ -5,7 +5,7 @@
 
 // Default CAP1188 I2C Address (depends on ADDR_COMM pin resistor)
 #ifndef CAP1188_I2C_ADDRESS
-#define CAP1188_I2C_ADDRESS 0x28 // Common address
+#define CAP1188_I2C_ADDRESS 0x29 // Common address
 #endif
 
 // Register Map (not exhaustive; add more if needed)
@@ -13,6 +13,16 @@
 #define REG_GENERAL_STATUS 0x02
 #define REG_SENSOR_INPUT_STATUS 0x03
 #define REG_NOISE_FLAG_STATUS 0x0A
+
+// Sensor data registers (raw values)
+#define REG_SENSOR_1_DELTA 0x10
+#define REG_SENSOR_2_DELTA 0x11
+#define REG_SENSOR_3_DELTA 0x12
+#define REG_SENSOR_4_DELTA 0x13
+#define REG_SENSOR_5_DELTA 0x14
+#define REG_SENSOR_6_DELTA 0x15
+#define REG_SENSOR_7_DELTA 0x16
+#define REG_SENSOR_8_DELTA 0x17
 
 // Some config registers
 #define REG_SENSITIVITY_CONTROL 0x1F
@@ -89,11 +99,17 @@ public:
     uint8_t getTouchStatus();        // returns bits: 1 means touched
     bool isTouched(uint8_t channel); // channel in [1..8]
 
+    // Raw value reading
+    int8_t getRawValue(uint8_t channel); // Get raw delta count for a channel [1..8]
+
     // Clear interrupt (INT bit)
     void clearInterrupt();
 
     // Set All Channels Enabled/Disabled
     void enableAllInputs(bool en);
+
+    // Enable multiple touch detection
+    void enableMultiTouch(bool enable);
 
     // Set threshold for a specific channel [1..8]
     void setThreshold(uint8_t channel, uint8_t threshold);

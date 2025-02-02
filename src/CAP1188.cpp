@@ -28,6 +28,9 @@ bool CAP1188::begin()
     // Enable all inputs by default
     enableAllInputs(true);
 
+    // Enable multiple touch detection by default
+    enableMultiTouch(true);
+
     // Example: set a default config if desired
     // e.g. enable digital noise filter, etc.
     // (REG_CONFIGURATION = 0x20 if you want some defaults)
@@ -49,6 +52,16 @@ bool CAP1188::isTouched(uint8_t channel)
         return false;
     uint8_t status = getTouchStatus();
     return (status & (1 << (channel - 1))) != 0;
+}
+
+int8_t CAP1188::getRawValue(uint8_t channel)
+{
+    if (channel < 1 || channel > 8)
+        return 0;
+    
+    // Read the delta count register for the specified channel
+    // The delta registers start at 0x10 and go up to 0x17
+    return (int8_t)readRegister(REG_SENSOR_1_DELTA + (channel - 1));
 }
 
 void CAP1188::clearInterrupt()
@@ -190,6 +203,22 @@ void CAP1188::setLEDOutput(uint8_t led, bool on)
     else
         regVal &= ~mask;
     writeRegister(REG_LED_OUTPUT_CONTROL, regVal);
+}
+
+void CAP1188::enableMultiTouch(bool enable)
+{
+    // Read current multiple touch config
+    uint8_t config = readRegister(REG_MULTIPLE_TOUCH_CONFIG);
+    
+    if (enable) {
+        // Clear the multiple touch blocking bit (bit 7)
+        config &= ~0x80;
+    } else {
+        // Set the multiple touch blocking bit
+        config |= 0x80;
+    }
+    
+    writeRegister(REG_MULTIPLE_TOUCH_CONFIG, config);
 }
 
 // --------------- Private I2C R/W ---------------------
