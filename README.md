@@ -174,3 +174,16 @@ void loop() {
     cap.clearInterrupt();
     delay(100);
 }
+```
+
+## Generating Documentation with Doxygen
+
+To generate documentation for this library using Doxygen, follow these steps:
+
+1. Install Doxygen from [http://www.doxygen.nl/download.html](http://www.doxygen.nl/download.html).
+2. Create a `Doxyfile` in the root directory of the library. You can generate a default `Doxyfile` by running `doxygen -g` in the terminal.
+3. Customize the `Doxyfile` as needed. Ensure the following settings are configured:
+   - `INPUT = src examples`
+   - `RECURSIVE = YES`
+4. Run `doxygen` in the terminal to generate the documentation. The output will be in the `html` directory by default.
+5. Open `html/index.html` in a web browser to view the generated documentation.

@@ -77,80 +77,169 @@
 #define MAIN_CONTROL_INT 0x01 // Bit0: INT bit
 
 // Example LED behavior bits (2 bits per LED)
+/**
+ * @enum CAP1188_LEDBehavior
+ * @brief LED behavior modes for the CAP1188.
+ */
 enum CAP1188_LEDBehavior
 {
-    LED_BEHAVIOR_DIRECT = 0x00,
-    LED_BEHAVIOR_PULSE1 = 0x01,
-    LED_BEHAVIOR_PULSE2 = 0x02,
-    LED_BEHAVIOR_BREATHE = 0x03
+    LED_BEHAVIOR_DIRECT = 0x00,  /**< Direct control */
+    LED_BEHAVIOR_PULSE1 = 0x01,  /**< Pulse pattern 1 */
+    LED_BEHAVIOR_PULSE2 = 0x02,  /**< Pulse pattern 2 */
+    LED_BEHAVIOR_BREATHE = 0x03  /**< Breathing pattern */
 };
 
 // A minimal CAP1188 driver for I2C
+/**
+ * @class CAP1188
+ * @brief A class to interface with the CAP1188 capacitive touch sensor.
+ */
 class CAP1188
 {
 public:
-    // Constructor
+    /**
+     * @brief Constructor for CAP1188 class.
+     * @param i2cAddr I2C address of the CAP1188 device.
+     * @param wirePort TwoWire instance for I2C communication.
+     */
     CAP1188(uint8_t i2cAddr = CAP1188_I2C_ADDRESS, TwoWire &wirePort = Wire);
 
-    // Initialize device, returns true if found
+    /**
+     * @brief Initializes the CAP1188 device.
+     * @return true if the device is found and initialized successfully, false otherwise.
+     */
     bool begin();
 
-    // Basic Touch Reading
-    uint8_t getTouchStatus();        // returns bits: 1 means touched
-    bool isTouched(uint8_t channel); // channel in [1..8]
+    /**
+     * @brief Gets the touch status of all inputs.
+     * @return 8-bit value where each bit represents a touch input (1 = touched).
+     */
+    uint8_t getTouchStatus();
 
-    // Raw value reading
-    int8_t getRawValue(uint8_t channel); // Get raw delta count for a channel [1..8]
+    /**
+     * @brief Checks if a specific channel is being touched.
+     * @param channel Channel number (1-8).
+     * @return true if the channel is touched, false otherwise.
+     */
+    bool isTouched(uint8_t channel);
 
-    // Clear interrupt (INT bit)
+    /**
+     * @brief Gets the raw delta count for a specific channel.
+     * @param channel Channel number (1-8).
+     * @return Raw delta count value.
+     */
+    int8_t getRawValue(uint8_t channel);
+
+    /**
+     * @brief Clears the interrupt flag.
+     */
     void clearInterrupt();
 
-    // Set All Channels Enabled/Disabled
+    /**
+     * @brief Enables or disables all touch inputs.
+     * @param en true to enable all inputs, false to disable.
+     */
     void enableAllInputs(bool en);
 
-    // Enable multiple touch detection
+    /**
+     * @brief Enables or disables multiple touch detection.
+     * @param enable true to enable multiple touch detection, false to disable.
+     */
     void enableMultiTouch(bool enable);
 
-    // Set threshold for a specific channel [1..8]
+    /**
+     * @brief Sets the touch sensitivity threshold for a specific channel.
+     * @param channel Channel number (1-8).
+     * @param threshold Threshold value.
+     */
     void setThreshold(uint8_t channel, uint8_t threshold);
 
-    // Set threshold for ALL channels at once
+    /**
+     * @brief Sets the same touch sensitivity threshold for all channels.
+     * @param threshold Threshold value to apply to all channels.
+     */
     void setAllThresholds(uint8_t threshold);
 
-    // Set sensitivity (DELTA_SENSE in reg 0x1F)
-    // range 0..7 => 128x..1x
+    /**
+     * @brief Sets the overall sensitivity level.
+     * @param level Sensitivity level (0-7), where 0 = 128x and 7 = 1x.
+     */
     void setSensitivity(uint8_t level);
 
-    // Force Calibration on desired channels (mask)
+    /**
+     * @brief Forces calibration on specified channels.
+     * @param channelMask Bit mask of channels to calibrate.
+     */
     void forceCalibration(uint8_t channelMask);
 
     // --------------- LED Functionality ---------------
-    // Set LED output type (push-pull = true, open-drain = false)
+    /**
+     * @brief Sets the LED output type.
+     * @param led LED number (1-8).
+     * @param pushPull true for push-pull, false for open-drain.
+     */
     void setLEDOutputType(uint8_t led, bool pushPull);
 
-    // Link LEDx to CSx automatically
+    /**
+     * @brief Links or unlinks an LED to its corresponding touch sensor.
+     * @param led LED number (1-8).
+     * @param link true to link, false to unlink.
+     */
     void linkLEDtoCS(uint8_t led, bool link);
 
-    // Set LED Behavior (Direct, Pulse1, Pulse2, Breathe)
+    /**
+     * @brief Sets the behavior mode for an LED.
+     * @param led LED number (1-8).
+     * @param behavior LED behavior mode.
+     */
     void setLEDBehavior(uint8_t led, CAP1188_LEDBehavior behavior);
 
-    // Set LED Duty (min & max) for different modes
-    // e.g. setLEDPulse1Duty(0xF0) => max=100%, min=77%
+    /**
+     * @brief Sets the duty cycle for Pulse1 pattern.
+     * @param duty Duty cycle value (top nibble = max duty, bottom nibble = min duty).
+     */
     void setLEDPulse1Duty(uint8_t duty);
+
+    /**
+     * @brief Sets the duty cycle for Pulse2 pattern.
+     * @param duty Duty cycle value.
+     */
     void setLEDPulse2Duty(uint8_t duty);
+
+    /**
+     * @brief Sets the duty cycle for Breathe pattern.
+     * @param duty Duty cycle value.
+     */
     void setLEDBreatheDuty(uint8_t duty);
+
+    /**
+     * @brief Sets the duty cycle for Direct LED control.
+     * @param duty Duty cycle value.
+     */
     void setLEDDirectDuty(uint8_t duty);
 
-    // Write to the LED Output Control register for manual on/off
-    // (only relevant if LED is not linked or set to direct)
+    /**
+     * @brief Directly controls LED state when in direct mode.
+     * @param led LED number (1-8).
+     * @param on true to turn on, false to turn off.
+     */
     void setLEDOutput(uint8_t led, bool on);
 
 private:
-    // I2C read/write
+    /**
+     * @brief Reads a value from a register.
+     * @param reg Register address.
+     * @return Value read from the register.
+     */
     uint8_t readRegister(uint8_t reg);
-    void writeRegister(uint8_t reg, uint8_t value);
-    // For potential expansions, block read/writes can be added.
 
-    uint8_t _i2cAddr;
-    TwoWire *_wire;
+    /**
+     * @brief Writes a value to a register.
+     * @param reg Register address.
+     * @param value Value to write to the register.
+     */
+    void writeRegister(uint8_t reg, uint8_t value);
+
+    uint8_t _i2cAddr; /**< I2C address of the CAP1188 device. */
+    TwoWire *_wire;   /**< TwoWire instance for I2C communication. */
 };
