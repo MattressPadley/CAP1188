@@ -1,10 +1,19 @@
 #include "CAP1188.h"
 
+/**
+ * @brief Constructor for CAP1188 class.
+ * @param i2cAddr I2C address of the CAP1188 device.
+ * @param wirePort TwoWire instance for I2C communication.
+ */
 CAP1188::CAP1188(uint8_t i2cAddr, TwoWire &wirePort)
     : _i2cAddr(i2cAddr), _wire(&wirePort)
 {
 }
 
+/**
+ * @brief Initializes the CAP1188 device.
+ * @return true if the device is found and initialized successfully, false otherwise.
+ */
 bool CAP1188::begin()
 {
     _wire->begin();
@@ -39,13 +48,21 @@ bool CAP1188::begin()
     return true;
 }
 
-// ------------------ Touch Status --------------------
+/**
+ * @brief Gets the touch status of all inputs.
+ * @return 8-bit value where each bit represents a touch input (1 = touched).
+ */
 uint8_t CAP1188::getTouchStatus()
 {
     // Returns the 8-bit value of which inputs are touched
     return readRegister(REG_SENSOR_INPUT_STATUS);
 }
 
+/**
+ * @brief Checks if a specific channel is being touched.
+ * @param channel Channel number (1-8).
+ * @return true if the channel is touched, false otherwise.
+ */
 bool CAP1188::isTouched(uint8_t channel)
 {
     if (channel < 1 || channel > 8)
@@ -54,6 +71,11 @@ bool CAP1188::isTouched(uint8_t channel)
     return (status & (1 << (channel - 1))) != 0;
 }
 
+/**
+ * @brief Gets the raw delta count for a specific channel.
+ * @param channel Channel number (1-8).
+ * @return Raw delta count value.
+ */
 int8_t CAP1188::getRawValue(uint8_t channel)
 {
     if (channel < 1 || channel > 8)
@@ -64,6 +86,9 @@ int8_t CAP1188::getRawValue(uint8_t channel)
     return (int8_t)readRegister(REG_SENSOR_1_DELTA + (channel - 1));
 }
 
+/**
+ * @brief Clears the interrupt flag.
+ */
 void CAP1188::clearInterrupt()
 {
     // Read current main control
@@ -73,14 +98,21 @@ void CAP1188::clearInterrupt()
     writeRegister(REG_MAIN_CONTROL, r & ~MAIN_CONTROL_INT);
 }
 
-// ------------------ Input Enable --------------------
+/**
+ * @brief Enables or disables all touch inputs.
+ * @param en true to enable all inputs, false to disable.
+ */
 void CAP1188::enableAllInputs(bool en)
 {
     // Write 0xFF to enable all, or 0x00 to disable all
     writeRegister(REG_SENSOR_INPUT_ENABLE, en ? 0xFF : 0x00);
 }
 
-// ----------------- Thresholds & Sensitivity ---------
+/**
+ * @brief Sets the touch sensitivity threshold for a specific channel.
+ * @param channel Channel number (1-8).
+ * @param threshold Threshold value.
+ */
 void CAP1188::setThreshold(uint8_t channel, uint8_t threshold)
 {
     if (channel < 1 || channel > 8)
@@ -89,6 +121,10 @@ void CAP1188::setThreshold(uint8_t channel, uint8_t threshold)
     writeRegister(REG_SENSOR_INPUT_THRESHOLD_1 + (channel - 1), threshold);
 }
 
+/**
+ * @brief Sets the same touch sensitivity threshold for all channels.
+ * @param threshold Threshold value to apply to all channels.
+ */
 void CAP1188::setAllThresholds(uint8_t threshold)
 {
     // If you set the BUT_LD_TH bit, writing to channel1 threshold
@@ -100,6 +136,10 @@ void CAP1188::setAllThresholds(uint8_t threshold)
     }
 }
 
+/**
+ * @brief Sets the overall sensitivity level.
+ * @param level Sensitivity level (0-7), where 0 = 128x and 7 = 1x.
+ */
 void CAP1188::setSensitivity(uint8_t level)
 {
     // SENSITIVITY_CONTROL (0x1F)
@@ -112,6 +152,10 @@ void CAP1188::setSensitivity(uint8_t level)
     writeRegister(REG_SENSITIVITY_CONTROL, reg);
 }
 
+/**
+ * @brief Forces calibration on specified channels.
+ * @param channelMask Bit mask of channels to calibrate.
+ */
 void CAP1188::forceCalibration(uint8_t channelMask)
 {
     // Writing 1 bits to REG_CALIBRATION_ACTIVATE forces re-cal
@@ -120,7 +164,11 @@ void CAP1188::forceCalibration(uint8_t channelMask)
     // The device auto-clears these bits after calibration
 }
 
-// ----------------- LED Functionality -----------------
+/**
+ * @brief Sets the LED output type.
+ * @param led LED number (1-8).
+ * @param pushPull true for push-pull, false for open-drain.
+ */
 void CAP1188::setLEDOutputType(uint8_t led, bool pushPull)
 {
     if (led < 1 || led > 8)
@@ -136,6 +184,11 @@ void CAP1188::setLEDOutputType(uint8_t led, bool pushPull)
     writeRegister(REG_LED_OUTPUT_TYPE, regVal);
 }
 
+/**
+ * @brief Links or unlinks an LED to its corresponding touch sensor.
+ * @param led LED number (1-8).
+ * @param link true to link, false to unlink.
+ */
 void CAP1188::linkLEDtoCS(uint8_t led, bool link)
 {
     if (led < 1 || led > 8)
@@ -150,6 +203,11 @@ void CAP1188::linkLEDtoCS(uint8_t led, bool link)
     writeRegister(REG_SENSOR_INPUT_LED_LINK, regVal);
 }
 
+/**
+ * @brief Sets the behavior mode for an LED.
+ * @param led LED number (1-8).
+ * @param behavior LED behavior mode.
+ */
 void CAP1188::setLEDBehavior(uint8_t led, CAP1188_LEDBehavior behavior)
 {
     if (led < 1 || led > 8)
@@ -170,6 +228,10 @@ void CAP1188::setLEDBehavior(uint8_t led, CAP1188_LEDBehavior behavior)
     writeRegister(regAddr, regVal);
 }
 
+/**
+ * @brief Sets the duty cycle for Pulse1 pattern.
+ * @param duty Duty cycle value (top nibble = max duty, bottom nibble = min duty).
+ */
 void CAP1188::setLEDPulse1Duty(uint8_t duty)
 {
     // The top nibble is max duty, bottom nibble min duty
@@ -177,19 +239,39 @@ void CAP1188::setLEDPulse1Duty(uint8_t duty)
     // see data sheet Table 6-60 for decode details
     writeRegister(REG_LED_PULSE1_DUTY_CYCLE, duty);
 }
+
+/**
+ * @brief Sets the duty cycle for Pulse2 pattern.
+ * @param duty Duty cycle value.
+ */
 void CAP1188::setLEDPulse2Duty(uint8_t duty)
 {
     writeRegister(REG_LED_PULSE2_DUTY_CYCLE, duty);
 }
+
+/**
+ * @brief Sets the duty cycle for Breathe pattern.
+ * @param duty Duty cycle value.
+ */
 void CAP1188::setLEDBreatheDuty(uint8_t duty)
 {
     writeRegister(REG_LED_BREATHE_DUTY_CYCLE, duty);
 }
+
+/**
+ * @brief Sets the duty cycle for Direct LED control.
+ * @param duty Duty cycle value.
+ */
 void CAP1188::setLEDDirectDuty(uint8_t duty)
 {
     writeRegister(REG_LED_DIRECT_DUTY_CYCLE, duty);
 }
 
+/**
+ * @brief Directly controls LED state when in direct mode.
+ * @param led LED number (1-8).
+ * @param on true to turn on, false to turn off.
+ */
 void CAP1188::setLEDOutput(uint8_t led, bool on)
 {
     // LED Output Control (0x74)
@@ -205,6 +287,10 @@ void CAP1188::setLEDOutput(uint8_t led, bool on)
     writeRegister(REG_LED_OUTPUT_CONTROL, regVal);
 }
 
+/**
+ * @brief Enables or disables multiple touch detection.
+ * @param enable true to enable multiple touch detection, false to disable.
+ */
 void CAP1188::enableMultiTouch(bool enable)
 {
     // Read current multiple touch config
@@ -221,7 +307,11 @@ void CAP1188::enableMultiTouch(bool enable)
     writeRegister(REG_MULTIPLE_TOUCH_CONFIG, config);
 }
 
-// --------------- Private I2C R/W ---------------------
+/**
+ * @brief Reads a value from a register.
+ * @param reg Register address.
+ * @return Value read from the register.
+ */
 uint8_t CAP1188::readRegister(uint8_t reg)
 {
     _wire->beginTransmission(_i2cAddr);
@@ -236,6 +326,11 @@ uint8_t CAP1188::readRegister(uint8_t reg)
     return 0xFF; // or throw an error, etc.
 }
 
+/**
+ * @brief Writes a value to a register.
+ * @param reg Register address.
+ * @param value Value to write to the register.
+ */
 void CAP1188::writeRegister(uint8_t reg, uint8_t value)
 {
     _wire->beginTransmission(_i2cAddr);
